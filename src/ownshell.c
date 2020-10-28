@@ -242,7 +242,7 @@ int major_hall(char **list) {
     int check = 0;
     while (cmp_exit(list[0])) {
         if (strcmp(list[0], "\0") != 0) {
-            check = major_hall(list);
+            check = additional_hall(list);
         }
         delete_list(list);
         if (check == -1) {
