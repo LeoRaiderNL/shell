@@ -3,14 +3,15 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
 
 int swap_dir(char **list) {
     char *sweet_home = getenv("HOME");
-    if (!strcmp(list[0], "cd")) {
-        if (list[1] == NULL || (!strcmp(list[1], "~"))) {
+    if (strcmp(list[0], "cd") == 0) {
+        if (list[1] == NULL || (strcmp(list[1], "~") == 0)) {
             chdir(sweet_home);
         } else {
             chdir(list[1]);
@@ -114,7 +115,7 @@ char ***great_divider(char **list, int *number, char *word) {
     char ***list_parts = malloc(sizeof(char**));
     list_parts[0] = NULL;
     if (!list_parts) {
-        perror("devider erro!\n");
+        perror("divider erro!\n");
         return NULL;
     }
     for (int i = 0; list[i] != NULL; i++) {
@@ -150,7 +151,7 @@ int implementation(char **list) {
 }
 
 int conv1(char ***list_parts, int count) {
-    int fd1[2] = {0, 1}, fd2[2] = {0, 1};
+    int oldfd[2] = {0, 1}, newfd[2] = {0, 1};
     int pos = -1;
     pid_t pid;
     for (int i = 0; i < count; i++) {
@@ -158,37 +159,38 @@ int conv1(char ***list_parts, int count) {
             continue;
         }
         if (i != (count - 1)) {
-            pipe(fd2);
+            pipe(newfd);
         }
         pid = fork();
         if (pid == 0) {
             if (i != 0) {
-                dup2(fd1[0], 0);
-                close(fd1[0]);
-                close(fd1[1]);
+                dup2(oldfd[0], 0);
+                close(oldfd[0]);
+                close(oldfd[1]);
             }
             if (i != (count - 1)) {
-                dup2(fd2[1], 1);
-                close(fd2[0]);
-                close(fd2[1]);
+                dup2(newfd[1], 1);
+                close(newfd[0]);
+                close(newfd[1]);
             }
             if (implementation(list_parts[i]) == -1)
                 return -1;
             return 1;
         } else if (pid > 0) {
             if (i != 0) {
-                close(fd1[0]);
-                close(fd1[1]);
+                close(oldfd[0]);
+                close(oldfd[1]);
             }
             if (i != (count - 1)) {
-                fd1[0] = fd2[0];
-                fd1[1] = fd2[1];
+                oldfd[0] = newfd[0];
+                oldfd[1] = newfd[1];
             }
         }
     }
+    wait(NULL);
     if (count > 1) {
-        close(fd1[0]);
-        close(fd1[1]);
+        close(oldfd[0]);
+        close(oldfd[1]);
     }
     return 0;
 }
@@ -201,15 +203,12 @@ int conv2(char ***list_parts, int count) {
                 continue;
         }
         pid = fork();
-        pos = search(list_parts[i], "&");
-        if (pos != -1) {
-            list_parts[i][pos] = NULL;
-        }
         if (pid == 0) {
             if (implementation(list_parts[i]) == -1)
                 return -1;
             return 1;
         }
+        wait(NULL);
     }
     return 0;
 }
