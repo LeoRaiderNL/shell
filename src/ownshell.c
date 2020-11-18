@@ -28,7 +28,8 @@ int cmp_exit(char *word) {
 
 void handler(int signo) {
     puts("\nSIGINT recieved\n");
-    user();
+    kill(0, SIGINT);
+    exit(1);
 }
 
 char *get_word(char *end) {
