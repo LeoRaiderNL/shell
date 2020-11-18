@@ -185,8 +185,8 @@ int conv1(char ***list_parts, int count) {
                 oldfd[1] = newfd[1];
             }
         }
+        wait(NULL);
     }
-    wait(NULL);
     if (count > 1) {
         close(oldfd[0]);
         close(oldfd[1]);
