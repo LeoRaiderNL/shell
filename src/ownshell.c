@@ -152,7 +152,6 @@ int implementation(char **list) {
 
 int conv1(char ***list_parts, int count) {
     int oldfd[2] = {0, 1}, newfd[2] = {0, 1};
-    int pos = -1;
     pid_t pid;
     for (int i = 0; i < count; i++) {
         if (swap_dir(list_parts[i]) == 1) {
@@ -196,7 +195,6 @@ int conv1(char ***list_parts, int count) {
 }
 
 int conv2(char ***list_parts, int count) {
-    int pos = -1;
     pid_t pid;
     for (int i = 0; i < count; i++) {
         if (swap_dir(list_parts[i]) == 1) {

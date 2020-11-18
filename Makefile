@@ -1,3 +1,2 @@
-CFLAGS = -Wall -Werror -lm -g
-main: src/ownshell.c
-	gcc src/$@.c -o bin/$@ $(CFLAGS)
+ownshell: src/ownshell.c
+	gcc src/$@.c -o src/$@ -Wall -Werror -lm -g
